@@ -1,6 +1,5 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
-  Play,
   Phone,
   User,
   Lock,
@@ -9,6 +8,7 @@ import {
   ArrowLeft,
   Loader2,
   ShieldCheck,
+  Film,
 } from 'lucide-react';
 import {
   signUp,
@@ -16,6 +16,8 @@ import {
   validatePhone,
   validatePassword,
 } from '@/lib/auth';
+import { fetchShowcaseShows } from '@/lib/api';
+import type { Show } from '@/lib/types';
 
 interface AuthScreenProps {
   mode: 'signin' | 'signup';
@@ -39,6 +41,24 @@ export default function AuthScreen({
   const [showPw, setShowPw] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [shows, setShows] = useState<Show[]>([]);
+
+  useEffect(() => {
+    let active = true;
+    fetchShowcaseShows(8)
+      .then((data) => {
+        if (active) setShows(data);
+      })
+      .catch(() => {
+        if (active) setShows([]);
+      });
+    return () => {
+      active = false;
+    };
+  }, []);
+
+  const backdrop = shows.find((s) => s.banner_url)?.banner_url ?? shows[0]?.poster_url ?? null;
+  const strip = shows.slice(0, 8);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -78,16 +98,23 @@ export default function AuthScreen({
 
   return (
     <div className="relative min-h-screen overflow-hidden bg-[#0A0A0F] text-white">
-      {/* Ambient glow */}
+      {/* Big background bleed from the catalog's own art */}
+      {backdrop && (
+        <div className="pointer-events-none absolute inset-0">
+          <div
+            className="absolute inset-0 bg-cover bg-center opacity-30 blur-3xl scale-125"
+            style={{ backgroundImage: `url(${backdrop})` }}
+          />
+        </div>
+      )}
       <div
         className="pointer-events-none absolute inset-0"
         style={{
           background:
-            'radial-gradient(circle at 20% 10%, rgba(255,77,94,0.18) 0%, rgba(10,10,15,0) 45%), radial-gradient(circle at 80% 90%, rgba(255,210,63,0.10) 0%, rgba(10,10,15,0) 45%)',
+            'radial-gradient(circle at 15% 0%, rgba(76,201,80,0.20) 0%, rgba(10,10,15,0) 50%), radial-gradient(circle at 85% 100%, rgba(76,201,80,0.10) 0%, rgba(10,10,15,0) 50%)',
         }}
       />
-      <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[#FF4D5E]/20 blur-3xl" />
-      <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-[#FFD23F]/10 blur-3xl" />
+      <div className="pointer-events-none absolute inset-0 bg-gradient-to-b from-[#0A0A0F]/50 via-[#0A0A0F]/75 to-[#0A0A0F]" />
 
       <div className="relative z-10 flex min-h-screen flex-col">
         {/* Top bar */}
@@ -99,9 +126,11 @@ export default function AuthScreen({
             <ArrowLeft className="h-4 w-4" /> Back
           </button>
           <div className="flex items-center gap-2">
-            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF4D5E] to-[#E63946] shadow-[0_0_18px_rgba(255,77,94,0.4)]">
-              <Play className="h-4 w-4 fill-white text-white" />
-            </div>
+            <img
+              src="/assets/images/logo-transparent.png"
+              alt="NINT ANIME"
+              className="h-8 w-8 drop-shadow-[0_0_14px_rgba(76,201,80,0.5)]"
+            />
             <span
               className="text-lg font-black tracking-wider"
               style={{ fontFamily: '"Bebas Neue", Inter, sans-serif' }}
@@ -110,6 +139,26 @@ export default function AuthScreen({
             </span>
           </div>
         </div>
+
+        {/* Glowing poster strip */}
+        {strip.length > 0 && (
+          <div className="flex justify-center gap-2 px-5 pt-2">
+            {strip.map((show) => (
+              <div
+                key={show.id}
+                className="relative aspect-[2/3] w-10 sm:w-12 flex-shrink-0 overflow-hidden rounded-md border border-white/10 opacity-80"
+              >
+                {show.poster_url ? (
+                  <img src={show.poster_url} alt={show.title} className="h-full w-full object-cover" />
+                ) : (
+                  <div className="flex h-full w-full items-center justify-center bg-[#14141C]">
+                    <Film className="h-3.5 w-3.5 text-white/20" />
+                  </div>
+                )}
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Form card */}
         <div className="flex flex-1 items-center justify-center px-5 py-8">
@@ -195,7 +244,7 @@ export default function AuthScreen({
               <button
                 type="submit"
                 disabled={loading}
-                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF4D5E] to-[#E63946] px-6 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_rgba(255,77,94,0.35)] transition hover:shadow-[0_14px_40px_rgba(255,77,94,0.5)] active:scale-[0.98] disabled:opacity-60"
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#4CC950] to-[#2E9E38] px-6 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_rgba(76,201,80,0.35)] transition hover:shadow-[0_14px_40px_rgba(76,201,80,0.5)] active:scale-[0.98] disabled:opacity-60"
               >
                 {loading ? (
                   <Loader2 className="h-5 w-5 animate-spin" />
@@ -212,7 +261,7 @@ export default function AuthScreen({
               {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
               <button
                 onClick={() => onSwitch(isSignUp ? 'signin' : 'signup')}
-                className="font-semibold text-[#FF4D5E] transition hover:text-[#FF6B7A]"
+                className="font-semibold text-[#4CC950] transition hover:text-[#7CFC7C]"
               >
                 {isSignUp ? 'Sign in' : 'Sign up'}
               </button>
@@ -260,7 +309,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pl-11 pr-11 text-sm text-white placeholder-white/30 outline-none transition focus:border-[#FF4D5E]/50 focus:bg-white/[0.07]"
+          className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pl-11 pr-11 text-sm text-white placeholder-white/30 outline-none transition focus:border-[#4CC950]/50 focus:bg-white/[0.07]"
         />
         {trailing && (
           <span className="absolute right-3.5 top-1/2 -translate-y-1/2">

@@ -274,7 +274,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
           <h1 className="text-lg font-bold">Admin: Video Management</h1>
           <button
             onClick={() => setAddShowOpen(true)}
-            className="flex items-center gap-1.5 rounded-full bg-[#FF4D5E] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#E63946]"
+            className="flex items-center gap-1.5 rounded-full bg-[#4CC950] px-4 py-2 text-sm font-bold text-white transition hover:bg-[#2E9E38]"
           >
             <Plus className="h-4 w-4" /> New Show
           </button>
@@ -284,7 +284,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Search shows…"
-              className="w-56 rounded-full border border-white/10 bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-white placeholder-white/40 outline-none focus:border-[#FF4D5E]/50"
+              className="w-56 rounded-full border border-white/10 bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-white placeholder-white/40 outline-none focus:border-[#4CC950]/50"
             />
           </div>
         </div>
@@ -306,7 +306,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
       <main className="mx-auto max-w-[1200px] px-4 py-8 sm:px-8">
         {loading ? (
           <div className="flex items-center justify-center py-20">
-            <Loader2 className="h-8 w-8 animate-spin text-[#FF4D5E]" />
+            <Loader2 className="h-8 w-8 animate-spin text-[#4CC950]" />
           </div>
         ) : (
           <div className="space-y-6">
@@ -393,7 +393,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                                 {isUploading && (
                                   <div className="mt-1.5 h-1 w-full overflow-hidden rounded-full bg-white/10">
                                     <div
-                                      className="h-full rounded-full bg-[#FF4D5E] transition-all"
+                                      className="h-full rounded-full bg-[#4CC950] transition-all"
                                       style={{ width: `${uploadProgress}%` }}
                                     />
                                   </div>
@@ -527,7 +527,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                                     )
                                   }
                                   disabled={busy}
-                                  className="flex items-center gap-1.5 rounded-lg bg-[#FF4D5E] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#E63946] disabled:opacity-50"
+                                  className="flex items-center gap-1.5 rounded-lg bg-[#4CC950] px-4 py-2 text-xs font-bold text-white transition hover:bg-[#2E9E38] disabled:opacity-50"
                                 >
                                   {busy ? (
                                     <Loader2 className="h-3.5 w-3.5 animate-spin" />
@@ -547,7 +547,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                           ) : (
                             <button
                               onClick={() => setAddEpOpen(show.id)}
-                              className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 px-4 py-2.5 text-xs font-semibold text-white/60 transition hover:border-[#FF4D5E]/40 hover:text-white"
+                              className="flex items-center gap-1.5 rounded-lg border border-dashed border-white/20 px-4 py-2.5 text-xs font-semibold text-white/60 transition hover:border-[#4CC950]/40 hover:text-white"
                             >
                               <Plus className="h-3.5 w-3.5" />
                               {show.type === 'movie' ? 'Add Movie Video Slot' : 'Add Episode'}
@@ -586,7 +586,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                     onClick={() => setNewShow({ ...newShow, type: 'series' })}
                     className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold ${
                       newShow.type === 'series'
-                        ? 'border-[#FF4D5E]/50 bg-[#FF4D5E]/10 text-white'
+                        ? 'border-[#4CC950]/50 bg-[#4CC950]/10 text-white'
                         : 'border-white/10 bg-white/5 text-white/60'
                     }`}
                   >
@@ -596,7 +596,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                     onClick={() => setNewShow({ ...newShow, type: 'movie' })}
                     className={`flex-1 rounded-lg border px-3 py-2 text-sm font-semibold ${
                       newShow.type === 'movie'
-                        ? 'border-[#FF4D5E]/50 bg-[#FF4D5E]/10 text-white'
+                        ? 'border-[#4CC950]/50 bg-[#4CC950]/10 text-white'
                         : 'border-white/10 bg-white/5 text-white/60'
                     }`}
                   >
@@ -683,7 +683,7 @@ export default function AdminScreen({ onBack }: AdminScreenProps) {
                 <button
                   onClick={handleCreateShow}
                   disabled={creatingShow}
-                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#FF4D5E] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#E63946] disabled:opacity-50"
+                  className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-[#4CC950] px-4 py-2.5 text-sm font-bold text-white transition hover:bg-[#2E9E38] disabled:opacity-50"
                 >
                   {creatingShow ? <Loader2 className="h-4 w-4 animate-spin" /> : <Plus className="h-4 w-4" />}
                   Create
