@@ -2,7 +2,11 @@
 export default {
   content: ['./index.html', './src/**/*.{js,ts,jsx,tsx}'],
   theme: {
-    extend: {},
+    extend: {
+      fontFamily: {
+        khmer: ['Battambang', 'Khmer OS Battambang', 'system-ui', 'sans-serif'],
+      },
+    },
   },
   plugins: [],
 };
