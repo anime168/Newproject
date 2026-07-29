@@ -20,9 +20,19 @@ export function isSubscribed(profile: Profile | null): boolean {
 // Convert a phone number into a fake email so Supabase email auth can be used
 // as a phone-based login. The password is the real secret; the email is a
 // deterministic placeholder derived from the digits.
+//
+// NOTE: this intentionally uses gmail.com as the domain, not a project-owned
+// domain like nintanime.app. Supabase Auth validates that the email's domain
+// has real DNS/MX records before accepting a signup — a domain with no mail
+// server configured (like an app-only domain with nothing but a web host)
+// gets rejected with "Email address ... is invalid" even though the format
+// is fine. Since email confirmation is OFF, no mail is ever actually sent to
+// these addresses, so borrowing a domain that's guaranteed to have valid MX
+// records is a safe, standard workaround — it never collides with a real
+// Gmail account because Supabase Auth users are scoped to this project only.
 export function phoneToEmail(phone: string): string {
   const digits = phone.replace(/\D/g, '');
-  return `${digits}@nintanime.app`;
+  return `${digits}@gmail.com`;
 }
 
 export function validatePhone(phone: string): string | null {
