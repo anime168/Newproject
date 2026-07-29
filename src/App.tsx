@@ -95,6 +95,12 @@ function App() {
     }
   };
 
+  useEffect(() => {
+    if (screen.name === 'admin' && !profile?.is_admin) {
+      setScreen({ name: 'home' });
+    }
+  }, [screen, profile]);
+
   if (screen.name === 'install') {
     return (
       <InstallScreen
@@ -130,7 +136,6 @@ function App() {
 
   if (screen.name === 'admin') {
     if (!profile?.is_admin) {
-      setScreen({ name: 'home' });
       return null;
     }
     return <AdminScreen onBack={() => setScreen({ name: 'home' })} />;
