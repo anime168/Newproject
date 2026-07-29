@@ -1,5 +1,5 @@
 import { useEffect, useState, useCallback } from 'react';
-import { Play, Info, Star, ChevronLeft, ChevronRight, Search, Flame, TrendingUp, User, Crown, Clock } from 'lucide-react';
+import { Play, Info, Star, ChevronLeft, ChevronRight, Search, Flame, TrendingUp, User, Crown, Clock, Globe } from 'lucide-react';
 import type { Show, ShowWithGenres, Genre } from '@/lib/types';
 import {
   fetchFeaturedShows,
@@ -7,6 +7,8 @@ import {
   fetchGenres,
 } from '@/lib/api';
 import ShowCard from '@/components/ShowCard';
+import { useLanguage } from '@/lib/useLanguage';
+import { homeScreenText } from '@/lib/homeScreenTranslations';
 
 interface HomeScreenProps {
   onSelectShow: (show: Show) => void;
@@ -24,6 +26,9 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
   const [error, setError] = useState<string | null>(null);
   const [heroIndex, setHeroIndex] = useState(0);
   const [query, setQuery] = useState('');
+  const [lang, setLang] = useLanguage();
+  const t = homeScreenText[lang];
+  const isKm = lang === 'km';
 
   useEffect(() => {
     let active = true;
@@ -78,7 +83,7 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
       <div className="flex min-h-screen items-center justify-center bg-[#0A0A0F]">
         <div className="flex flex-col items-center gap-4">
           <div className="h-10 w-10 animate-spin rounded-full border-2 border-white/10 border-t-[#FF4D5E]" />
-          <p className="text-sm text-white/50">Loading your library…</p>
+          <p className={`text-sm text-white/50 ${isKm ? 'font-khmer' : ''}`}>{t.loading}</p>
         </div>
       </div>
     );
@@ -88,7 +93,7 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
     return (
       <div className="flex min-h-screen items-center justify-center bg-[#0A0A0F] px-6">
         <div className="max-w-md text-center">
-          <p className="text-lg font-semibold text-[#FF4D5E]">Something went wrong</p>
+          <p className={`text-lg font-semibold text-[#FF4D5E] ${isKm ? 'font-khmer' : ''}`}>{t.errorTitle}</p>
           <p className="mt-2 text-sm text-white/60">{error}</p>
         </div>
       </div>
@@ -118,11 +123,11 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
                 NINT ANIME
               </span>
             </div>
-            <nav className="hidden items-center gap-5 text-sm font-medium text-white/70 md:flex">
-              <span className="cursor-pointer text-white transition hover:text-[#FF4D5E]">Home</span>
-              <span className="cursor-pointer transition hover:text-[#FF4D5E]">Series</span>
-              <span className="cursor-pointer transition hover:text-[#FF4D5E]">Movies</span>
-              <span className="cursor-pointer transition hover:text-[#FF4D5E]">My List</span>
+            <nav className={`hidden items-center gap-5 text-sm font-medium text-white/70 md:flex ${isKm ? 'font-khmer' : ''}`}>
+              <span className="cursor-pointer text-white transition hover:text-[#FF4D5E]">{t.navHome}</span>
+              <span className="cursor-pointer transition hover:text-[#FF4D5E]">{t.navSeries}</span>
+              <span className="cursor-pointer transition hover:text-[#FF4D5E]">{t.navMovies}</span>
+              <span className="cursor-pointer transition hover:text-[#FF4D5E]">{t.navMyList}</span>
             </nav>
             <div className="ml-auto flex items-center gap-3">
               <div className="relative hidden sm:block">
@@ -130,16 +135,39 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
                 <input
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
-                  placeholder="Search titles…"
-                  className="w-48 rounded-full border border-white/10 bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-white placeholder-white/40 outline-none transition focus:w-64 focus:border-[#FF4D5E]/50 focus:bg-white/[0.07]"
+                  placeholder={t.searchPlaceholder}
+                  className={`w-48 rounded-full border border-white/10 bg-white/[0.04] py-2 pl-9 pr-4 text-sm text-white placeholder-white/40 outline-none transition focus:w-64 focus:border-[#FF4D5E]/50 focus:bg-white/[0.07] ${isKm ? 'font-khmer' : ''}`}
                 />
+              </div>
+              <div className="hidden items-center gap-0.5 rounded-full border border-white/10 bg-white/[0.04] p-0.5 sm:flex">
+                <Globe className="ml-1.5 h-3 w-3 text-white/40" />
+                <button
+                  type="button"
+                  onClick={() => setLang('en')}
+                  aria-pressed={lang === 'en'}
+                  className={`rounded-full px-2 py-1 text-[11px] font-semibold transition ${
+                    lang === 'en' ? 'bg-[#FF4D5E] text-white' : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  EN
+                </button>
+                <button
+                  type="button"
+                  onClick={() => setLang('km')}
+                  aria-pressed={lang === 'km'}
+                  className={`font-khmer rounded-full px-2 py-1 text-[11px] font-semibold transition ${
+                    lang === 'km' ? 'bg-[#FF4D5E] text-white' : 'text-white/60 hover:text-white'
+                  }`}
+                >
+                  ខ្មែរ
+                </button>
               </div>
               <button
                 onClick={onOpenSubscription}
-                className="flex items-center gap-1.5 rounded-full border border-[#FFD23F]/30 bg-[#FFD23F]/10 px-3 py-1.5 text-xs font-bold text-[#FFD23F] transition hover:bg-[#FFD23F]/20"
+                className={`flex items-center gap-1.5 rounded-full border border-[#FFD23F]/30 bg-[#FFD23F]/10 px-3 py-1.5 text-xs font-bold text-[#FFD23F] transition hover:bg-[#FFD23F]/20 ${isKm ? 'font-khmer' : ''}`}
               >
                 <Crown className="h-3.5 w-3.5" />
-                {subscribed ? 'Premium' : 'Subscribe'}
+                {subscribed ? t.premium : t.subscribe}
               </button>
               <button
                 onClick={onOpenProfile}
@@ -179,8 +207,8 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
           <div className="relative z-10 mx-auto flex h-full max-w-[1400px] flex-col justify-end px-4 pb-16 sm:px-8">
             <div className="max-w-xl">
               <div className="mb-3 flex items-center gap-2">
-                <span className="rounded bg-[#FF4D5E] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white">
-                  Featured
+                <span className={`rounded bg-[#FF4D5E] px-2 py-0.5 text-[11px] font-bold uppercase tracking-wider text-white ${isKm ? 'font-khmer normal-case tracking-normal' : ''}`}>
+                  {t.featured}
                 </span>
                 <span className="flex items-center gap-1 text-sm font-semibold text-[#FFD23F]">
                   <Star className="h-4 w-4 fill-[#FFD23F]" /> {Number(hero.rating).toFixed(1)}
@@ -199,15 +227,15 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
               <div className="mt-6 flex items-center gap-3">
                 <button
                   onClick={() => onSelectShow(hero)}
-                  className="flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-black transition hover:bg-white/90 active:scale-95"
+                  className={`flex items-center gap-2 rounded-xl bg-white px-6 py-3 text-sm font-bold text-black transition hover:bg-white/90 active:scale-95 ${isKm ? 'font-khmer' : ''}`}
                 >
-                  <Play className="h-5 w-5 fill-black" /> Play
+                  <Play className="h-5 w-5 fill-black" /> {t.play}
                 </button>
                 <button
                   onClick={() => onSelectShow(hero)}
-                  className="flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20"
+                  className={`flex items-center gap-2 rounded-xl border border-white/20 bg-white/10 px-6 py-3 text-sm font-bold text-white backdrop-blur-sm transition hover:bg-white/20 ${isKm ? 'font-khmer' : ''}`}
                 >
-                  <Info className="h-5 w-5" /> More Info
+                  <Info className="h-5 w-5" /> {t.moreInfo}
                 </button>
               </div>
             </div>
@@ -264,13 +292,13 @@ export default function HomeScreen({ onSelectShow, onOpenProfile, onOpenSubscrip
               <Clock className="h-5 w-5 text-[#FFD23F]" />
             </div>
             <div className="flex-1">
-              <p className="text-sm font-bold text-white">Unlock full access</p>
-              <p className="text-xs text-white/50">
-                Subscribe to start streaming — plans from $2/month
+              <p className={`text-sm font-bold text-white ${isKm ? 'font-khmer' : ''}`}>{t.unlockTitle}</p>
+              <p className={`text-xs text-white/50 ${isKm ? 'font-khmer' : ''}`}>
+                {t.unlockSubtitle}
               </p>
             </div>
-            <span className="flex items-center gap-1 rounded-full bg-[#FFD23F] px-3 py-1.5 text-xs font-bold text-black">
-              <Crown className="h-3.5 w-3.5" /> Subscribe
+            <span className={`flex items-center gap-1 rounded-full bg-[#FFD23F] px-3 py-1.5 text-xs font-bold text-black ${isKm ? 'font-khmer' : ''}`}>
+              <Crown className="h-3.5 w-3.5" /> {t.subscribe}
             </span>
           </button>
         </div>
