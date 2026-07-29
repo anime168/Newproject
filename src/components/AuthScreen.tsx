@@ -1,0 +1,273 @@
+import { useState } from 'react';
+import {
+  Play,
+  Phone,
+  User,
+  Lock,
+  Eye,
+  EyeOff,
+  ArrowLeft,
+  Loader2,
+  ShieldCheck,
+} from 'lucide-react';
+import {
+  signUp,
+  signIn,
+  validatePhone,
+  validatePassword,
+} from '@/lib/auth';
+
+interface AuthScreenProps {
+  mode: 'signin' | 'signup';
+  onBack: () => void;
+  onSuccess: () => void;
+  onSwitch: (mode: 'signin' | 'signup') => void;
+}
+
+export default function AuthScreen({
+  mode,
+  onBack,
+  onSuccess,
+  onSwitch,
+}: AuthScreenProps) {
+  const isSignUp = mode === 'signup';
+
+  const [name, setName] = useState('');
+  const [phone, setPhone] = useState('');
+  const [password, setPassword] = useState('');
+  const [confirm, setConfirm] = useState('');
+  const [showPw, setShowPw] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+
+    if (isSignUp && name.trim().length < 2) {
+      setError('Please enter your name');
+      return;
+    }
+    const phoneErr = validatePhone(phone);
+    if (phoneErr) {
+      setError(phoneErr);
+      return;
+    }
+    const pwErr = validatePassword(password);
+    if (pwErr) {
+      setError(pwErr);
+      return;
+    }
+    if (isSignUp && password !== confirm) {
+      setError('Passwords do not match');
+      return;
+    }
+
+    setLoading(true);
+    const res = isSignUp
+      ? await signUp({ name: name.trim(), phone, password })
+      : await signIn({ phone, password });
+    setLoading(false);
+
+    if (res.error) {
+      setError(res.error);
+      return;
+    }
+    onSuccess();
+  };
+
+  return (
+    <div className="relative min-h-screen overflow-hidden bg-[#0A0A0F] text-white">
+      {/* Ambient glow */}
+      <div
+        className="pointer-events-none absolute inset-0"
+        style={{
+          background:
+            'radial-gradient(circle at 20% 10%, rgba(255,77,94,0.18) 0%, rgba(10,10,15,0) 45%), radial-gradient(circle at 80% 90%, rgba(255,210,63,0.10) 0%, rgba(10,10,15,0) 45%)',
+        }}
+      />
+      <div className="pointer-events-none absolute -top-24 -left-24 h-72 w-72 rounded-full bg-[#FF4D5E]/20 blur-3xl" />
+      <div className="pointer-events-none absolute bottom-0 right-0 h-96 w-96 rounded-full bg-[#FFD23F]/10 blur-3xl" />
+
+      <div className="relative z-10 flex min-h-screen flex-col">
+        {/* Top bar */}
+        <div className="flex items-center justify-between px-5 py-4">
+          <button
+            onClick={onBack}
+            className="flex items-center gap-2 rounded-full border border-white/10 bg-white/[0.04] px-4 py-2 text-sm font-medium text-white/80 backdrop-blur-sm transition hover:bg-white/[0.08] hover:text-white"
+          >
+            <ArrowLeft className="h-4 w-4" /> Back
+          </button>
+          <div className="flex items-center gap-2">
+            <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-[#FF4D5E] to-[#E63946] shadow-[0_0_18px_rgba(255,77,94,0.4)]">
+              <Play className="h-4 w-4 fill-white text-white" />
+            </div>
+            <span
+              className="text-lg font-black tracking-wider"
+              style={{ fontFamily: '"Bebas Neue", Inter, sans-serif' }}
+            >
+              NINT ANIME
+            </span>
+          </div>
+        </div>
+
+        {/* Form card */}
+        <div className="flex flex-1 items-center justify-center px-5 py-8">
+          <div className="w-full max-w-md">
+            <div className="mb-6 text-center">
+              <h1
+                className="text-4xl font-black tracking-tight"
+                style={{ fontFamily: '"Bebas Neue", Inter, sans-serif', letterSpacing: '0.03em' }}
+              >
+                {isSignUp ? 'CREATE ACCOUNT' : 'WELCOME BACK'}
+              </h1>
+              <p className="mt-2 text-sm text-white/50">
+                {isSignUp
+                  ? 'Sign up to start watching your favorite anime'
+                  : 'Sign in to continue your watchlist'}
+              </p>
+            </div>
+
+            <form
+              onSubmit={handleSubmit}
+              className="rounded-2xl border border-white/10 bg-white/[0.03] p-6 backdrop-blur-sm"
+            >
+              {isSignUp && (
+                <Field
+                  icon={<User className="h-5 w-5" />}
+                  label="Name"
+                  type="text"
+                  value={name}
+                  onChange={setName}
+                  placeholder="Your name"
+                  autoComplete="name"
+                />
+              )}
+
+              <Field
+                icon={<Phone className="h-5 w-5" />}
+                label="Phone number"
+                type="tel"
+                value={phone}
+                onChange={setPhone}
+                placeholder="e.g. +1 555 123 4567"
+                autoComplete="tel"
+              />
+
+              <Field
+                icon={<Lock className="h-5 w-5" />}
+                label="Password"
+                type={showPw ? 'text' : 'password'}
+                value={password}
+                onChange={setPassword}
+                placeholder="At least 6 characters"
+                autoComplete={isSignUp ? 'new-password' : 'current-password'}
+                trailing={
+                  <button
+                    type="button"
+                    onClick={() => setShowPw((s) => !s)}
+                    className="text-white/40 transition hover:text-white/70"
+                    aria-label={showPw ? 'Hide password' : 'Show password'}
+                  >
+                    {showPw ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                  </button>
+                }
+              />
+
+              {isSignUp && (
+                <Field
+                  icon={<Lock className="h-5 w-5" />}
+                  label="Confirm password"
+                  type={showPw ? 'text' : 'password'}
+                  value={confirm}
+                  onChange={setConfirm}
+                  placeholder="Re-enter your password"
+                  autoComplete="new-password"
+                />
+              )}
+
+              {error && (
+                <div className="mt-4 rounded-lg border border-[#EF4444]/30 bg-[#EF4444]/10 px-4 py-3 text-sm text-[#EF4444]">
+                  {error}
+                </div>
+              )}
+
+              <button
+                type="submit"
+                disabled={loading}
+                className="mt-6 flex w-full items-center justify-center gap-2 rounded-xl bg-gradient-to-r from-[#FF4D5E] to-[#E63946] px-6 py-3.5 text-sm font-bold text-white shadow-[0_10px_30px_rgba(255,77,94,0.35)] transition hover:shadow-[0_14px_40px_rgba(255,77,94,0.5)] active:scale-[0.98] disabled:opacity-60"
+              >
+                {loading ? (
+                  <Loader2 className="h-5 w-5 animate-spin" />
+                ) : (
+                  <>
+                    <ShieldCheck className="h-5 w-5" />
+                    {isSignUp ? 'Create Account' : 'Sign In'}
+                  </>
+                )}
+              </button>
+            </form>
+
+            <p className="mt-6 text-center text-sm text-white/50">
+              {isSignUp ? 'Already have an account?' : "Don't have an account?"}{' '}
+              <button
+                onClick={() => onSwitch(isSignUp ? 'signin' : 'signup')}
+                className="font-semibold text-[#FF4D5E] transition hover:text-[#FF6B7A]"
+              >
+                {isSignUp ? 'Sign in' : 'Sign up'}
+              </button>
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+interface FieldProps {
+  icon: React.ReactNode;
+  label: string;
+  type: string;
+  value: string;
+  onChange: (v: string) => void;
+  placeholder: string;
+  autoComplete?: string;
+  trailing?: React.ReactNode;
+}
+
+function Field({
+  icon,
+  label,
+  type,
+  value,
+  onChange,
+  placeholder,
+  autoComplete,
+  trailing,
+}: FieldProps) {
+  return (
+    <div className="mt-4 first:mt-0">
+      <label className="mb-1.5 block text-xs font-medium uppercase tracking-wider text-white/50">
+        {label}
+      </label>
+      <div className="relative">
+        <span className="pointer-events-none absolute left-3.5 top-1/2 -translate-y-1/2 text-white/40">
+          {icon}
+        </span>
+        <input
+          type={type}
+          value={value}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder={placeholder}
+          autoComplete={autoComplete}
+          className="w-full rounded-xl border border-white/10 bg-white/[0.04] py-3 pl-11 pr-11 text-sm text-white placeholder-white/30 outline-none transition focus:border-[#FF4D5E]/50 focus:bg-white/[0.07]"
+        />
+        {trailing && (
+          <span className="absolute right-3.5 top-1/2 -translate-y-1/2">
+            {trailing}
+          </span>
+        )}
+      </div>
+    </div>
+  );
+}
